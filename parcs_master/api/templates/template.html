@@ -1,0 +1,33 @@
+<html>
+<head>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+
+     <!-- Latest compiled and minified JavaScript -->
+    <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+    <script src="{{ url('static',filename='js/app.js') }}" type="text/javascript" charset="utf-8"></script>
+    <link rel="stylesheet" type="text/css" href="{{ url('static',filename='css/style.css') }}">
+
+    <title>Python PARCS</title>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <nav class="navbar navbar-light" style="background-color: #e3f2fd;">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="/instances/">Instances</a>
+                </div>
+                <ul class="nav navbar-nav">
+                    <li><a href="/jobs/">Jobs</a></li>
+                    <li><a href="/add_job/">Add Job</a></li>
+                </ul>
+            </nav>
+        </div>
+        <div class="">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+</body>
+</html>

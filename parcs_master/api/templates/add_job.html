@@ -1,0 +1,11 @@
+{% extends "template.html" %}
+{% block content %}
+<h1>Upload files</h1>
+<form method="POST" action="/add_job/" enctype="multipart/form-data">
+    <label for="solution_file">Choose a solution file:</label>
+    <input class="form-control form-control-lg" type="file" name="solution_file" id="solution_file" required><br><br>
+    <label for="input_file">Choose a input file:</label>
+    <input class="form-control form-control-lg" type="file" name="input_file" id="input_file" required><br><br>
+    <input class="btn btn-success" type="submit" value="Upload">
+</form>
+{% endblock %}

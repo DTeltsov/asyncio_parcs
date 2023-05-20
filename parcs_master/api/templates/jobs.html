@@ -1,0 +1,26 @@
+{% extends "template.html" %} {% block content %}
+<div class="parcs-list">
+    {% if jobs|length==0%}
+        <h2>There are no jobs.</h2>
+    {%else%}
+        {% for job in jobs %}
+            <div class="well img-rounded">
+                <div class="row">
+                    <div class="col-md-2 i-id text-center">Job id: {{ job.job_id }}</div>
+                    <div class="col-md-2 i-attr-name text-center">Input file: </div>
+                    <div class="col-md-1 i-attr-value text-center">{{ job.input_file.file_name }}</div>
+                    <div class="col-md-2 i-attr-name text-center">Solution file: </div>
+                    <div class="col-md-1 i-attr-value text-center">{{ job.solution_file.file_name }}</div>
+                    <div class="col-md-2 i-attr-name text-center">Status: </div>
+                    <div class="col-md-1 i-attr-value text-center">{{ job.status }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-2 text-center">
+                        <input class="btn btn-primary" type="submit" value="Download output"/>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {%endif%}
+</div>
+{% endblock %}
