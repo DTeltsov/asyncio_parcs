@@ -1,26 +1,26 @@
 from aiohttp import web
-from parcs_node.job import File
+from collections import namedtuple
+
+File = namedtuple('File', ['file_name', 'file_path'])
 
 
-async def solution_file_view(request):
-    job_id = await request.json()['job_id']
-    reader = await request.multipart()
-    field = await reader.next()
+async def upload_file_view(request):
+    data = await request.post()
+    job_id = data.get('job_id')
+    field = data.get('file')
     filename = field.filename
     file = File(filename, filename)
     with open(filename, 'wb') as f:
-        while True:
-            chunk = await field.read_chunk()
-            if not chunk:
-                break
-            f.write(chunk)
-    request.app['job_controller'].create_job(job_id, file)
-    return web.json_response({'detail': 'file uploaded'}, status=201)
+        f.write(field.file.read())
+    job = await request.app['job_controller'].create_job(job_id, file)
+    methods = await job.register_methods(request.app['rpc'])
+    return web.json_response({'detail': 'file uploaded', "methods": methods}, status=201)
 
 
 async def execute_view(request):
     json_body = await request.json()
-    data = json_body['data']
-    job = request.app['job_controller'].get_job_by_id(json_body['job_id'])
-    result = await job.execute(data)
+    args = json_body['data'].get('args', ())
+    kwargs = json_body['data'].get('kwargs', {})
+    job = await request.app['job_controller'].get_job_by_id(json_body['job_id'])
+    result = await job.register_methods(args, kwargs)
     return web.json_response({'result': result}, status=200)

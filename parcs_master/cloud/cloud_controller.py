@@ -1,10 +1,11 @@
+import asyncio
 from abc import ABC, abstractmethod
 
 from google.cloud import compute_v1
 from google.oauth2 import service_account
 
-from parcs_master.cloud.consts import STARTUP_SCRIPT
-from parcs_master.cloud.instance import Instance
+from .consts import STARTUP_SCRIPT
+from .instance import Instance
 
 
 class AbstractCloudController(ABC):
@@ -46,11 +47,18 @@ class GoogleCloudController(AbstractCloudController):
             for instance in await self.__get_instances()
         }
 
+    @property
+    def __loop(self):
+        return asyncio.get_running_loop()
+
     async def get_instances(self):
         return list((await self.__instances).values())
 
     async def __get_instances(self):
-        regions = self.__compute_client.aggregated_list(project=self.__project)
+        regions = await self.__loop.run_in_executor(
+            None,
+            lambda: self.__compute_client.aggregated_list(project=self.__project)
+        )
         existing_instances = []
         for region in regions:
             if region[1].instances:
@@ -91,18 +99,25 @@ class GoogleCloudController(AbstractCloudController):
                 ]
             )
         )
-        self.__compute_client.insert(
-            project=self.__project,
-            zone=self.__zone,
-            instance_resource=config
+        await self.__loop.run_in_executor(
+            None,
+            lambda: self.__compute_client.insert(
+                project=self.__project,
+                zone=self.__zone,
+                instance_resource=config
+            )
         )
         if len(await self.__instances) % 4 == 0:
             self.__region = next(self.__regions)
         return await self.__instances
 
     async def delete_instance(self, instance_name):
-        self.__compute_client.delete(
-            project=self.__project,
-            zone=(await self.__instances)[instance_name].zone,
-            instance=instance_name
+        zone = (await self.__instances)[instance_name].zone
+        await self.__loop.run_in_executor(
+            None,
+            lambda: self.__compute_client.delete(
+                project=self.__project,
+                zone=zone,
+                instance=instance_name
+            )
         )

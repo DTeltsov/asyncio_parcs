@@ -1,6 +1,5 @@
-FROM python:3.9
-WORKDIR /parcs_node
-COPY requirements.txt requirements.txt
-RUN pip install -r requirements.txt
+FROM python:3.11
+COPY . ./parcs_node
+RUN pip install -r ./parcs_node/requirements.txt
 EXPOSE 8080
-COPY . /parcs_node
+CMD ["python", "./parcs_node/app.py"]

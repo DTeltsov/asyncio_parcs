@@ -1,22 +1,27 @@
-import asyncio
 import importlib
 from collections import namedtuple
+from inspect import getmembers, isroutine
 
 File = namedtuple('File', ['file_name', 'file_path'])
 
 
 class Job:
-    def __init__(self, solution_file: File):
+    def __init__(self, job_id, solution_file: File):
+        self.id = job_id
         self.__solution_file = solution_file
 
-    async def execute(self, *args, **kwargs):
+    async def register_methods(self, rpc_server):
         try:
             module = importlib.import_module(self.__solution_file.file_name)
         except ModuleNotFoundError:
-            spec = importlib.util.spec_from_file_location(self.__solution_file.file_name, self.__solution_file.file_path)
+            spec = importlib.util.spec_from_file_location(
+                self.__solution_file.file_name,
+                self.__solution_file.file_path
+            )
             module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(module)
-        function = getattr(module, 'solve')
-        loop = asyncio.get_event_loop()
-        result = await loop.run_in_executor(None, function, *args, **kwargs)
-        return result
+        solver = module.Solver()
+        if not (methods := [method[1] for method in getmembers(solver, isroutine) if not method[0].startswith('_')]):
+            return 'No methods detected'
+        rpc_server.add_methods(methods, replace=True)
+        return rpc_server.get_methods()

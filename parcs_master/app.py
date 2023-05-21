@@ -6,15 +6,15 @@ import aiohttp_jinja2
 import jinja2
 from aiohttp import web
 
-from parcs_master.api.routes import init_routes
-from parcs_master.cloud import GoogleCloudController
-from parcs_master.job import JobsController
+from api.routes import init_routes
+from cloud import GoogleCloudController
+from job import JobsController
 
 
 def init_jinja2(app) -> None:
     aiohttp_jinja2.setup(
         app,
-        loader=jinja2.FileSystemLoader(str(Path(__file__).parent / 'templates'))
+        loader=jinja2.FileSystemLoader(str(Path(__file__).parent / 'api/templates'))
     )
 
 

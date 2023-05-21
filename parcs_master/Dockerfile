@@ -1,7 +1,5 @@
-FROM python:3.9
-WORKDIR ./parcs_master/parcs_master
-COPY requirements.txt requirements.txt
-RUN pip install -r requirements.txt
+FROM python:3.11
+COPY . ./parcs_master
+RUN pip install -r ./parcs_node/requirements.txt
 EXPOSE 8080
-COPY . ./parcs_master/parcs_master
-CMD ["python", "./parcs_master/parcs_master/api/app.py"]
+CMD ["python", "./parcs_master/app.py"]
