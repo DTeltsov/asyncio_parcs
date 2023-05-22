@@ -4,7 +4,6 @@ from collections import namedtuple
 
 from aiohttp import web, ClientSession, FormData
 from aiohttp_jinja2 import template
-from parcs_master.cloud.instance import Instance
 from aiohttp_rpc import JsonRpcClient
 
 File = namedtuple('File', ['file_name', 'file_path'])
@@ -50,16 +49,14 @@ async def add_job_view(request):
         job_id = await request.app['jobs_controller'].get_id()
         files = await upload_files(request, job_id)
         job = await request.app['jobs_controller'].create_job(files[0], files[1])
-        # instances = await request.app['cloud_controller'].get_instances()
-        instances = [Instance()]
+        instances = await request.app['cloud_controller'].get_instances()
         tasks = []
         for instance in instances:
             task = send_data(instance.upload_url, files[0].file_path, {"job_id": job_id})
             tasks.append(task)
         await asyncio.gather(*tasks)
         async with ClientSession() as session:
-            bad_result = await job.execute([JsonRpcClient(instance.rpc, session=session) for instance in instances])
-        print(bad_result)
+            await job.execute([JsonRpcClient(instance.rpc, session=session) for instance in instances])
         return web.HTTPFound('/jobs/')
     elif request.method == 'GET':
         return {}

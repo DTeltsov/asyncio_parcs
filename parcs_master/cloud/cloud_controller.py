@@ -4,8 +4,8 @@ from abc import ABC, abstractmethod
 from google.cloud import compute_v1
 from google.oauth2 import service_account
 
-from .consts import STARTUP_SCRIPT
 from .instance import Instance
+import pathlib
 
 
 class AbstractCloudController(ABC):
@@ -94,7 +94,7 @@ class GoogleCloudController(AbstractCloudController):
                 items=[
                     compute_v1.Items(
                         key="startup-script",
-                        value=STARTUP_SCRIPT
+                        value=open(pathlib.Path(__file__).parent / 'startup_script.sh').read()
                     )
                 ]
             )
