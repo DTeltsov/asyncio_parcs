@@ -12,7 +12,6 @@ class Job:
         self.job_id = job_id
         self.solution_file = solution_file
         self.input_file = input_file
-        self.result = None
         self.status = 'Created'
 
     async def execute(self, instances):
@@ -25,9 +24,8 @@ class Job:
             spec.loader.exec_module(module)
         solver = module.Solver(instances, self.input_file.file_name)
         try:
-            self.result = await solver.solve()
+            await solver.solve()
             self.status = 'Success'
         except Exception as e:
-            self.status = str(e)
-            self.result = str(e)
-        return self.result
+            self.status = 'Error'
+

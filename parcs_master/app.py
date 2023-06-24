@@ -1,4 +1,5 @@
 import argparse
+import logging
 import sys
 from pathlib import Path
 
@@ -36,4 +37,5 @@ if __name__ == '__main__':
         sys.exit(0)
 
     app = create_app(creds=argv.cloud_creds)
-    web.run_app(app)
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+    web.run_app(app, access_log_format='"%r" %s %b')

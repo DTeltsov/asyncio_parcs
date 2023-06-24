@@ -9,7 +9,7 @@ class JobsController:
     async def create_job(self, solution_file, input_file):
         self.__last_id += 1
         job = Job(self.__last_id, solution_file, input_file)
-        self.__jobs.append(Job(self.__last_id, solution_file, input_file))
+        self.__jobs.append(job)
         return job
 
     async def get_jobs(self):
